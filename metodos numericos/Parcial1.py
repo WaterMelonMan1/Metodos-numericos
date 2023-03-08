@@ -3,6 +3,8 @@ from PIL import Image,ImageTk
 import tkinter.font as font
 from tkinter import messagebox
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import sympy
+import random
 
 class App():
     def __init__(self):
@@ -37,24 +39,46 @@ class App():
         #ContadorRegla
         self.labelContadorRegla = Label(ventana,text="contador regla",font=Fuente2,bg="white")
         self.labelContadorRegla.place(x=430,y=380)
+
+        #ENtrada de polinomio
+        self.Ecuacion = None
+        #Numero random
+        self.numero = None
+        self.numero2 = None
         #Texto por teclado
         self.polinomio = Entry(ventana,bg='white',font=Fuente)
         self.polinomio.place(x=100,y=100)
 
         #Botones
+        #checkbox
+        self.Tanteo = IntVar()
+        self.Biseccion = IntVar()
+        self.Regla = IntVar()
         #Tanteo
-        self.seleccionTanteo = Checkbutton(ventana,text="Tanteo",font=Fuente,bg="white")
-        self.seleccionTanteo.place(x=100,y=320)
+        self.seleccionTanteo = Checkbutton(ventana,text="Tanteo",font=Fuente,bg="white",variable=self.Tanteo)
+        
+        #checkBox
         #biseccion
-        self.seleccionBiseccion = Checkbutton(ventana,text="Biseccion",font=Fuente,bg="white")
-        self.seleccionBiseccion.place(x=250,y=320)
+        self.seleccionBiseccion = Checkbutton(ventana,text="Biseccion",font=Fuente,bg="white", variable=self.Biseccion)
+        
         #regla falsa
-        self.seleccionRegla = Checkbutton(ventana,text="Regla Falsa",font=Fuente,bg="white")
+        self.seleccionRegla = Checkbutton(ventana,text="Regla Falsa",font=Fuente,bg="white", variable=self.Regla)
+        
+
+        self.checkboxes = [self.seleccionTanteo, self.seleccionBiseccion, self.seleccionRegla]
+        for checkbox in self.checkboxes:
+            checkbox.pack()
+            
+            # Configura la función "command" de cada checkbox
+            checkbox.config(command=lambda c=checkbox: self.deselect_all(c))
+        self.seleccionTanteo.place(x=100,y=320)
+        self.seleccionBiseccion.place(x=250,y=320)
         self.seleccionRegla.place(x=430,y=320)
+
+        #Boton pulsar
         #resultado
-        #resultado
-        self.botonResultado = Button(ventana,text="Calcular",width=30,height=3,font=Fuente2,bg="white",command="")
-        self.botonResultado.place(x=100, y=500)
+        self.botonResultado = Button(ventana,text="Calcular",width=30,height=3,font=Fuente2,bg="white",command=self.Calcular)
+        self.botonResultado.place(x=100, y=450)
 
         #mostrargrafica
         #grafica
@@ -67,6 +91,28 @@ class App():
 
         ventana.mainloop()
 
+    #Funciones
+    #Unica opcion de checkbox
+    def deselect_all(self, current_checkbox):
+        # Desmarca todos los checkboxes, excepto el que se acaba de marcar
+        for checkbox in self.checkboxes:
+            if checkbox is not current_checkbox:
+                checkbox.deselect()
+
+
+    def Calcular(self):
+        self.numero = random.randint(0,10)
+        self.numero2 = random.randint(-10,10)
+        if(self.Tanteo.get()==1):
+            iteraciones = 0
+            ramdom = 4
+            Ecuacion = self.polinomio.get()
+            self.labelContadorTanteo.config(text=Ecuacion)
+            
+        #elif(self.Biseccion.get()==1):
+         #   self.labelContadorBiseccion.config(text="hola")
+        #elif(self.Regla.get()==1):
+         #   self.labelContadorRegla.config(text="hola")
 
 #interfaz principal
 ventanaPrincipal=App()
