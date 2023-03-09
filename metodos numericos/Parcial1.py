@@ -1,9 +1,12 @@
 from tkinter import *
-from PIL import Image,ImageTk
+from PIL import Image,ImageTk, ImageDraw
 import tkinter.font as font
 from tkinter import messagebox
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import random
+import matplotlib.pyplot as plt
+from io import BytesIO
+import numpy as np
 
 class App():
     def __init__(self):
@@ -18,6 +21,7 @@ class App():
         #widgets
         Fuente = font.Font(size=20)
         Fuente2 = font.Font(size=14)
+        self.fig, self.ax = plt.subplots()
 
         #Mensajes
         #label indicacion 1
@@ -28,7 +32,7 @@ class App():
         self.labelMetodo.place(x=100,y=260)
         #label reusultadoRaiz
         self.labelRaiz = Label(ventana, text="Raiz", font=Fuente, bg="white")
-        self.labelRaiz.place(x=240,y=590)
+        self.labelRaiz.place(x=240,y=665)
         #contadorTanteo
         self.labelContadorTanteo = Label(ventana, text="contador tanteo", font=Fuente2, bg="white")
         self.labelContadorTanteo.place(x=100,y=380)
@@ -77,12 +81,11 @@ class App():
 
         self.botonGraficar = Button(ventana,text="Graficar",width=30,height=3,font=Fuente2,bg="white",command=self.Graficar)
         self.botonGraficar.place(x=100, y=550)
-
         #mostrargrafica
         #grafica
-        image = Image.open("imagen/foto.jpg")
-        foto = ImageTk.PhotoImage(image)
-        self.imagen = Label(ventana, image=foto,width=500,height=500)
+        self.image = Image.open("imagen/foto.jpg")
+        self.foto = ImageTk.PhotoImage(self.image)
+        self.imagen = Label(ventana, image=self.foto,width=500,height=500)
         self.imagen.place(x=700,y=50)
 
     
@@ -118,6 +121,7 @@ class App():
 
         if (self.Biseccion.get()==1):
             ecu = self.polinomio.get()
+            ecu = ecu.replace("x", "{}")
             a = random.randint(-20, 20)
             b = random.randint(-20, 20)
             iterador_max = 1000000
@@ -149,6 +153,7 @@ class App():
 
         if (self.Regla.get()==1):
             ecu = self.polinomio.get()
+            ecu = ecu.replace("x", "{}")
             a = random.randint(-20, 20)
             b = random.randint(-20, 20)
             iterador_max = 1000000
@@ -177,6 +182,33 @@ class App():
                else:
                    a = random.randint(-20, 20)
                    b = random.randint(-20, 20)
+
+
+
+    def Graficar(self):
+        ecuacion = self.polinomio.get()
+        raiz = float(self.labelRaiz.cget("text"))
+        if (self.Regla.get()==1 or self.Biseccion.get()==1):
+            ecuacion = ecuacion.replace("{}", "x")
+        
+        x = np.linspace(-10, 10, 1000)
+
+        y = eval(ecuacion)
+
+        fig, ax = plt.subplots()
+        ax.cla()
+        ax.plot(x,y)
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_title('Gráfica de la ecuación: ' + ecuacion)
+
+        ax.axhline(y=0, color='k')
+        ax.axvline(x=0, color='k')
+        ax.plot(raiz, 0, 'ro')
+
+        canvas = FigureCanvasTkAgg(fig, master=self.imagen)
+        canvas.draw()
+        canvas.get_tk_widget().pack()      
                     
 
 #interfaz principal
