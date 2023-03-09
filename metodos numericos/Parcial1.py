@@ -3,7 +3,6 @@ from PIL import Image,ImageTk
 import tkinter.font as font
 from tkinter import messagebox
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import sympy
 import random
 
 class App():
@@ -99,20 +98,59 @@ class App():
             if checkbox is not current_checkbox:
                 checkbox.deselect()
 
-
     def Calcular(self):
-        self.numero = random.randint(0,10)
-        self.numero2 = random.randint(-10,10)
-        if(self.Tanteo.get()==1):
-            iteraciones = 0
-            ramdom = 4
-            Ecuacion = self.polinomio.get()
-            self.labelContadorTanteo.config(text=Ecuacion)
+        if (self.Tanteo.get()==1):
+            x = random.randint(-10, 10)
+            ecu = self.polinomio.get()
+            iterador = 0
+            tolerancia = 0
+            if abs (eval(ecu.format(x)) == tolerancia):
+                self.labelContadorTanteo.config(text=iterador)
+                self.labelRaiz.config(text=x)
+            else:
+                while (eval(ecu.format(x)) != tolerancia):
+                    if ((eval(ecu.format(x)) > tolerancia)):
+                        x1 = x - 1
+                        x = x1
+                        iterador = iterador + 1
+                    else:
+                        x1 = x + 1
+                        x = x1
+                        iterador = iterador + 1
+                    if abs (eval(ecu.format(x)) == tolerancia):
+                        self.labelContadorTanteo.config(text=iterador)
+                        self.labelRaiz.config(text=x)
+                        break
+
+
+        if (self.Biseccion.get()==1):
+            ecu = self.polinomio.get()
+            a = 2
+            b = 10
+            iterador = 0
+            tolerancia = 0
+            c = 0
+
+            while True:
+                if eval(ecu.format(a)) * eval(ecu.format(b)) < 0:
+                    while True:
+                        c = (a + b) / 2
+                        if abs(eval(ecu.format(a)) * eval(ecu.format(c))) <= tolerancia:
+                            self.labelContadorBiseccion.config(text=iterador)
+                            self.labelRaiz.config(text=c)
+                            break
+                        elif eval(ecu.format(a)) * eval(ecu.format(b)) < 0:
+                            b = c
+                            iterador = iterador + 1
+                        else:
+                            a = c
+                            iterador = iterador + 1
+                    break
+                else:
+                 a = random.randint(-10, 10)
+                 b = random.randint(-10, 10)   
             
-        #elif(self.Biseccion.get()==1):
-         #   self.labelContadorBiseccion.config(text="hola")
-        #elif(self.Regla.get()==1):
-         #   self.labelContadorRegla.config(text="hola")
+            
 
 #interfaz principal
 ventanaPrincipal=App()
