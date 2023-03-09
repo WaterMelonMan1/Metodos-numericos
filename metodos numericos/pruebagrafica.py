@@ -1,45 +1,45 @@
-n1=int(input('Ingrese el primer número de la ecucación: '))
-sig=int(input('Ingrese el signo de la ecuación si es + ingrese 1, si es - ingrese 0: '))
-n2=int(input('Ingrese el segundo número de la ecucación: '))
-import random as rnd
-x = rnd.randint(-20,20)
-print('el valor aleatorio de x es:',x)
-if(sig ==0):
-  print('la ecuación es: ',n1,'X -',n2)
-  if abs((n1 * x) - n2) == 0:
-    print("La respuesta es: " , x)
-  else:
-    cont = 0
-    while True:
-      if ((n1 * x) - n2) < 0:
-        x1 = x + 1
-        x = x1
-        cont = cont + 1
-      else:
-        x1 = x - 1
-        x = x1
-        cont = cont + 1
-      if abs((n1 * x) - n2) <= 0:
-        print("felicidades la respuesta es: " , x)
-        print("Tardó " , cont, " intentos")
-        break
-else:
- if(sig ==1):
-   print('la ecuación es: ',n1,'X +',n2)
-   if abs((n1 * x) + n2) == 0:
-     print("La respuesta es: " , x)
-   else:
-     cont = 0
-     while True:
-       if ((n1 * x) + n2) < 0:
-         x1 = x + 1
-         x = x1
-         cont = cont + 1
-       else:
-         x1 = x - 1
-         x = x1
-         cont = cont + 1
-       if abs((n1 * x) + n2) <= 0:
-         print("felicidades la respuesta es: " , x)
-         print("Tardó " , cont, " intentos")
-         break
+import tkinter as tk
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Crear la ventana de la interfaz gráfica
+ventana = tk.Tk()
+ventana.title("Gráfica de polinomios")
+
+# Crear un cuadro de texto para ingresar la ecuación del polinomio
+lbl_ecuacion = tk.Label(ventana, text="Ecuación: ")
+lbl_ecuacion.pack(side=tk.LEFT)
+
+txt_ecuacion = tk.Entry(ventana)
+txt_ecuacion.pack(side=tk.LEFT)
+
+# Crear un botón para graficar la ecuación
+def graficar():
+    # Obtener la ecuación del polinomio ingresada por el usuario
+    ecuacion = txt_ecuacion.get()
+
+    # Evaluar la ecuación del polinomio en un rango de valores de x
+    x = np.linspace(-10, 10, 100)
+    y = eval(ecuacion)
+
+    # Graficar la ecuación del polinomio
+    plt.plot(x, y)
+
+    # Encontrar el punto de corte de la gráfica en el eje x
+    raices = np.roots([float(coeficiente) for coeficiente in ecuacion.split("x^")])
+
+    # Mostrar el punto de corte de la gráfica en el eje x
+    plt.plot(raices, [0]*len(raices), 'ro')
+
+    # Mostrar los ejes x y y
+    plt.axhline(y=0, color='k')
+    plt.axvline(x=0, color='k')
+
+    # Mostrar la gráfica en una ventana
+    plt.show()
+
+btn_graficar = tk.Button(ventana, text="Graficar", command=graficar)
+btn_graficar.pack(side=tk.LEFT)
+
+# Ejecutar la ventana de la interfaz gráfica
+ventana.mainloop()

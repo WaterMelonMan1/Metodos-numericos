@@ -75,6 +75,9 @@ class App():
         self.botonResultado = Button(ventana,text="Calcular",width=30,height=3,font=Fuente2,bg="white",command=self.Calcular)
         self.botonResultado.place(x=100, y=450)
 
+        self.botonGraficar = Button(ventana,text="Graficar",width=30,height=3,font=Fuente2,bg="white",command=self.Graficar)
+        self.botonGraficar.place(x=100, y=550)
+
         #mostrargrafica
         #grafica
         image = Image.open("imagen/foto.jpg")
