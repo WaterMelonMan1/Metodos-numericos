@@ -39,14 +39,10 @@ class App():
         self.labelContadorRegla = Label(ventana,text="contador regla",font=Fuente2,bg="white")
         self.labelContadorRegla.place(x=430,y=380)
 
-        #ENtrada de polinomio
-        self.Ecuacion = None
-        #Numero random
-        self.numero = None
-        self.numero2 = None
         #Texto por teclado
         self.polinomio = Entry(ventana,bg='white',font=Fuente)
         self.polinomio.place(x=100,y=100)
+
 
         #Botones
         #checkbox
@@ -100,57 +96,85 @@ class App():
 
     def Calcular(self):
         if (self.Tanteo.get()==1):
-            x = random.randint(-10, 10)
             ecu = self.polinomio.get()
             iterador = 0
-            tolerancia = 0
-            if abs (eval(ecu.format(x)) == tolerancia):
-                self.labelContadorTanteo.config(text=iterador)
-                self.labelRaiz.config(text=x)
-            else:
-                while (eval(ecu.format(x)) != tolerancia):
-                    if ((eval(ecu.format(x)) > tolerancia)):
-                        x1 = x - 1
-                        x = x1
-                        iterador = iterador + 1
-                    else:
-                        x1 = x + 1
-                        x = x1
-                        iterador = iterador + 1
-                    if abs (eval(ecu.format(x)) == tolerancia):
-                        self.labelContadorTanteo.config(text=iterador)
-                        self.labelRaiz.config(text=x)
-                        break
-
+            x = random.randint(-10,10)
+            while True:
+               fx = eval(ecu.format(x))
+               if abs(fx) == 0:  # La precisión se puede ajustar a la necesidad
+                   self.labelRaiz.config(text=x)
+                   self.labelContadorTanteo.config(text=iterador)
+                   break
+               elif fx > 0:
+                   x -= 1
+                   iterador = iterador + 1
+               else:
+                   x += 1
+                   iterador = iterador + 1
+            
 
         if (self.Biseccion.get()==1):
             ecu = self.polinomio.get()
-            a = 2
-            b = 10
+            a = random.randint(-20, 20)
+            b = random.randint(-20, 20)
+            iterador_max = 1000000
             iterador = 0
-            tolerancia = 0
+            tolerancia = 0.00001
             c = 0
 
             while True:
                 if eval(ecu.format(a)) * eval(ecu.format(b)) < 0:
+                    iterador = 0
                     while True:
                         c = (a + b) / 2
                         if abs(eval(ecu.format(a)) * eval(ecu.format(c))) <= tolerancia:
                             self.labelContadorBiseccion.config(text=iterador)
                             self.labelRaiz.config(text=c)
                             break
-                        elif eval(ecu.format(a)) * eval(ecu.format(b)) < 0:
+                        elif eval(ecu.format(a)) * eval(ecu.format(c)) < 0:
                             b = c
                             iterador = iterador + 1
                         else:
                             a = c
                             iterador = iterador + 1
+                        if iterador >= iterador_max or abs(b - a) <= tolerancia:
+                            break
                     break
                 else:
-                 a = random.randint(-10, 10)
-                 b = random.randint(-10, 10)   
-            
-            
+                 a = random.randint(-20, 20)
+                 b = random.randint(-20, 20)
+
+        if (self.Regla.get()==1):
+            ecu = self.polinomio.get()
+            a = random.randint(-20, 20)
+            b = random.randint(-20, 20)
+            iterador_max = 1000000
+            iterador = 0
+            tolerancia = 0.01
+            c = 0
+
+            while True:
+               if eval(ecu.format(a)) * eval(ecu.format(b)) < 0:
+                    iterador = 0
+                    while True:
+                         c = a- ((eval(ecu.format(a)))*(b-a))/((eval(ecu.format(b)))-(eval(ecu.format(a))))
+                         if abs(eval(ecu.format(a)) * eval(ecu.format(c))) <= tolerancia:
+                             self.labelContadorRegla.config(text=iterador)
+                             self.labelRaiz.config(text=c)
+                             break
+                         elif eval(ecu.format(a)) * eval(ecu.format(c)) < 0:
+                             b = c
+                             iterador = iterador + 1
+                         else:
+                             a = c
+                             iterador = iterador + 1
+                         if iterador >= iterador_max or abs(b - a) <= tolerancia:
+                             break
+                    break
+               else:
+                   a = random.randint(-20, 20)
+                   b = random.randint(-20, 20)
+                    
 
 #interfaz principal
 ventanaPrincipal=App()
