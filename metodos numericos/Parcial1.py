@@ -7,6 +7,7 @@ import random
 import matplotlib.pyplot as plt
 from io import BytesIO
 import numpy as np
+import sympy
 
 class App():
     def __init__(self):
@@ -29,19 +30,28 @@ class App():
         self.labelIndicacion.place(x=100,y=50)
         #label metodo
         self.labelMetodo = Label(ventana,text="Seleccionar metodo",font=Fuente,bg="white")
-        self.labelMetodo.place(x=100,y=260)
+        self.labelMetodo.place(x=100,y=160)
         #label reusultadoRaiz
         self.labelRaiz = Label(ventana, text="Raiz", font=Fuente, bg="white")
         self.labelRaiz.place(x=240,y=665)
         #contadorTanteo
         self.labelContadorTanteo = Label(ventana, text="contador tanteo", font=Fuente2, bg="white")
-        self.labelContadorTanteo.place(x=100,y=380)
+        self.labelContadorTanteo.place(x=100,y=280)
         #ContadorBiseccion
         self.labelContadorBiseccion = Label(ventana,text="contador bis",font=Fuente2, bg="white")
-        self.labelContadorBiseccion.place(x=250,y=380)
+        self.labelContadorBiseccion.place(x=250,y=280)
         #ContadorRegla
         self.labelContadorRegla = Label(ventana,text="contador regla",font=Fuente2,bg="white")
-        self.labelContadorRegla.place(x=430,y=380)
+        self.labelContadorRegla.place(x=430,y=280)
+        #contadorNewton
+        self.labelContadorNewton = Label(ventana, text="contador Newton", font=Fuente2, bg="white")
+        self.labelContadorNewton.place(x=100,y=410)
+        #ContadorSecante
+        self.labelContadorSecante = Label(ventana,text="contador Seca",font=Fuente2, bg="white")
+        self.labelContadorSecante.place(x=260,y=410)
+        #Contadorsteffensen
+        self.labelContadorSteffensen = Label(ventana,text="contador Stef",font=Fuente2, bg="white")
+        self.labelContadorSteffensen.place(x=430,y=410)
 
         #Texto por teclado
         self.polinomio = Entry(ventana,bg='white',font=Fuente)
@@ -53,34 +63,49 @@ class App():
         self.Tanteo = IntVar()
         self.Biseccion = IntVar()
         self.Regla = IntVar()
+        self.Newton = IntVar()
+        self.Secante = IntVar()
+        self.steffensen = IntVar()
         #Tanteo
         self.seleccionTanteo = Checkbutton(ventana,text="Tanteo",font=Fuente,bg="white",variable=self.Tanteo)
         
-        #checkBox
         #biseccion
         self.seleccionBiseccion = Checkbutton(ventana,text="Biseccion",font=Fuente,bg="white", variable=self.Biseccion)
         
         #regla falsa
         self.seleccionRegla = Checkbutton(ventana,text="Regla Falsa",font=Fuente,bg="white", variable=self.Regla)
-        
 
-        self.checkboxes = [self.seleccionTanteo, self.seleccionBiseccion, self.seleccionRegla]
+        #newton
+        self.seleccionNewton = Checkbutton(ventana,text="Newton",font=Fuente,bg="white", variable=self.Newton)
+        
+        #secante
+        self.seleccionSecante = Checkbutton(ventana,text="Secante",font=Fuente,bg="white", variable=self.Secante)
+        
+        #Steffensen
+        self.seleccionSteffensen = Checkbutton(ventana,text="Steffensen",font=Fuente,bg="white", variable=self.steffensen)
+        #comprobar solo una casilla
+        self.checkboxes = [self.seleccionTanteo, self.seleccionBiseccion, self.seleccionRegla,self.seleccionNewton,self.seleccionSecante,self.seleccionSteffensen]
         for checkbox in self.checkboxes:
             checkbox.pack()
             
             # Configura la función "command" de cada checkbox
             checkbox.config(command=lambda c=checkbox: self.deselect_all(c))
-        self.seleccionTanteo.place(x=100,y=320)
-        self.seleccionBiseccion.place(x=250,y=320)
-        self.seleccionRegla.place(x=430,y=320)
-
+        self.seleccionTanteo.place(x=100,y=220)
+        self.seleccionBiseccion.place(x=250,y=220)
+        self.seleccionRegla.place(x=430,y=220)
+        self.seleccionNewton.place(x=100,y=350)
+        self.seleccionSecante.place(x=260,y=350)
+        self.seleccionSteffensen.place(x=430,y=350)
         #Boton pulsar
         #resultado
-        self.botonResultado = Button(ventana,text="Calcular",width=30,height=3,font=Fuente2,bg="white",command=self.Calcular)
-        self.botonResultado.place(x=100, y=450)
+        self.botonResultado = Button(ventana,text="Calcular",width=25,height=3,font=Fuente2,bg="white",command=self.Calcular)
+        self.botonResultado.place(x=400, y=550)
 
-        self.botonGraficar = Button(ventana,text="Graficar",width=30,height=3,font=Fuente2,bg="white",command=self.Graficar)
+        self.botonGraficar = Button(ventana,text="Graficar",width=25,height=3,font=Fuente2,bg="white",command=self.Graficar)
         self.botonGraficar.place(x=100, y=550)
+
+        self.limpio = Button(ventana,text="Limpiar",width=15,height=3,font=Fuente2,bg="white",command=self.limpiar)
+        self.limpio.place(x=850, y=600)
         #mostrargrafica
         #grafica
         self.image = Image.open("imagen/foto.jpg")
@@ -108,6 +133,7 @@ class App():
             while True:
                fx = eval(ecu.format(x))
                if abs(fx) == 0:  # La precisión se puede ajustar a la necesidad
+                   iterador = iterador + 1 
                    self.labelRaiz.config(text=x)
                    self.labelContadorTanteo.config(text=iterador)
                    break
@@ -121,7 +147,6 @@ class App():
 
         if (self.Biseccion.get()==1):
             ecu = self.polinomio.get()
-            ecu = ecu.replace("x", "{}")
             a = random.randint(-20, 20)
             b = random.randint(-20, 20)
             iterador_max = 1000000
@@ -135,6 +160,7 @@ class App():
                     while True:
                         c = (a + b) / 2
                         if abs(eval(ecu.format(a)) * eval(ecu.format(c))) <= tolerancia:
+                            iterador = iterador + 1
                             self.labelContadorBiseccion.config(text=iterador)
                             self.labelRaiz.config(text=c)
                             break
@@ -156,7 +182,7 @@ class App():
             ecu = ecu.replace("x", "{}")
             a = random.randint(-20, 20)
             b = random.randint(-20, 20)
-            iterador_max = 1000000
+            iterador_max = 1000
             iterador = 0
             tolerancia = 0.01
             c = 0
@@ -167,6 +193,7 @@ class App():
                     while True:
                          c = a- ((eval(ecu.format(a)))*(b-a))/((eval(ecu.format(b)))-(eval(ecu.format(a))))
                          if abs(eval(ecu.format(a)) * eval(ecu.format(c))) <= tolerancia:
+                             iterador = iterador + 1
                              self.labelContadorRegla.config(text=iterador)
                              self.labelRaiz.config(text=c)
                              break
@@ -183,6 +210,61 @@ class App():
                    a = random.randint(-20, 20)
                    b = random.randint(-20, 20)
 
+        if (self.Newton.get()==1):
+            ecu = self.polinomio.get()
+            x0 = random.uniform(-20, 20) # Elegimos un valor aleatorio para empezar
+            iterador_max = 1000000
+            iterador = 0
+            tolerancia = 0.01
+            delta = 0.0001
+
+            while True:
+                fx0 = eval(ecu.replace('x', f'({x0})'))
+                dfx0 = (eval(ecu.replace('x', f'({x0 + delta})')) - fx0) / delta
+                x1 = x0 - fx0/dfx0
+                if abs(x1 - x0) < tolerancia:
+                    break
+                x0 = x1
+                iterador += 1
+                if iterador >= iterador_max:
+                    break
+
+            self.labelContadorNewton.config(text=iterador)
+            self.labelRaiz.config(text=x1)
+        
+        if (self.Secante.get()==1):
+            ecu = self.polinomio.get()
+            ecu = ecu.replace("x", "{}")
+            c = 0
+            Soluciones=[]
+            Max_Seeds=100
+            i=0
+            acc =0.001
+            cont=0
+            while i <= Max_Seeds:
+                a = random.randint(-20,20)
+                b = random.randint(-20,20)
+                if eval(ecu.format(a,a,a)) * eval(ecu.format(b, b, b)) < 0:
+                    while True:
+                        #Xc= Xa - ((f(Xa)*(Xa-Xb))/(f(Xa)- f(Xb)))
+                        c= a -(eval(ecu.format(a,a,a))*(a-b))/(eval(ecu.format(a,a,a))-eval(ecu.format(b,b,b)))
+                        if abs(eval(ecu.format(c,c,c))) < acc:
+                            cont= cont+1
+                            break
+                        elif (eval(ecu.format(a,a,a))*eval(ecu.format(c,c,c))) < 0:
+                            b=c
+                            cont= cont+1
+                        else:
+                            a=c
+                            cont = cont + 1
+                    i+=1
+                    c= round(c, 2)
+                    if c not in Soluciones:
+                        Soluciones.append(c)
+                
+            cadena_lista = ", ".join(str(x) for x in Soluciones)
+            self.labelContadorSecante.config(text=cont)
+            self.labelRaiz.config(text=cadena_lista)
 
 
     def Graficar(self):
@@ -208,7 +290,13 @@ class App():
 
         canvas = FigureCanvasTkAgg(fig, master=self.imagen)
         canvas.draw()
-        canvas.get_tk_widget().pack()      
+        canvas.get_tk_widget().pack() 
+
+    def limpiar(self):
+        canvas = self.imagen.winfo_children()[0]
+        canvas.destroy()
+
+     
                     
 
 #interfaz principal
