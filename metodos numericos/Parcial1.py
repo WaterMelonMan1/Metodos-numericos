@@ -220,22 +220,15 @@ class App():
             Soluciones = []
             Max_Iteraciones = 100
             Tolerancia = 1e-6 # ajusta la tolerancia para obtener una mayor precisión
-            cont = 0
             for semilla in range(-20, 20):
                 x0 = semilla
-                for i in range(Max_Iteraciones):
-                    f_x0 = f.subs(x, x0)
-                    f_prima_x0 = f.diff(x).subs(x, x0)
-                    x1 = x0 - (f_x0 / f_prima_x0)
-                    if abs(x1 - x0) < Tolerancia:
-                        cont += 1
-                        if x1 not in Soluciones:
-                            Soluciones.append(x1)
-                        break
-                    x0 = x1
-                    cont += 1
+                try:
+                    solucion = sympy.nsolve(f, x, x0, maxiter=Max_Iteraciones, tol=Tolerancia)
+                    if solucion not in Soluciones:
+                        Soluciones.append(solucion)
+                except (ValueError, NotImplementedError):
+                    pass
             cadena_lista = ", ".join(str(x) for x in Soluciones)
-            self.labelContadorNewton.config(text=cont)
             self.labelRaiz.config(text=cadena_lista)
         
         if (self.Secante.get()==1):
