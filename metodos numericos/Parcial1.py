@@ -210,27 +210,33 @@ class App():
                    a = random.randint(-20, 20)
                    b = random.randint(-20, 20)
 
-        if (self.Newton.get()==1):
-            ecu = self.polinomio.get()
-            x0 = random.uniform(-20, 20) # Elegimos un valor aleatorio para empezar
-            iterador_max = 1000000
-            iterador = 0
-            tolerancia = 0.01
-            delta = 0.0001
 
-            while True:
-                fx0 = eval(ecu.replace('x', f'({x0})'))
-                dfx0 = (eval(ecu.replace('x', f'({x0 + delta})')) - fx0) / delta
-                x1 = x0 - fx0/dfx0
-                if abs(x1 - x0) < tolerancia:
-                    break
-                x0 = x1
-                iterador += 1
-                if iterador >= iterador_max:
-                    break
 
-            self.labelContadorNewton.config(text=iterador)
-            self.labelRaiz.config(text=x1)
+        if self.Newton.get() == 1:
+            ecuacion = self.polinomio.get()
+            ecuacion = ecuacion.replace("{}", "x")
+            x = sympy.Symbol('x')
+            f = sympy.sympify(ecuacion) # convierte la expresión de cadena en una expresión simbólica
+            Soluciones = []
+            Max_Iteraciones = 100
+            Tolerancia = 1e-6 # ajusta la tolerancia para obtener una mayor precisión
+            cont = 0
+            for semilla in range(-20, 20):
+                x0 = semilla
+                for i in range(Max_Iteraciones):
+                    f_x0 = f.subs(x, x0)
+                    f_prima_x0 = f.diff(x).subs(x, x0)
+                    x1 = x0 - (f_x0 / f_prima_x0)
+                    if abs(x1 - x0) < Tolerancia:
+                        cont += 1
+                        if x1 not in Soluciones:
+                            Soluciones.append(x1)
+                        break
+                    x0 = x1
+                    cont += 1
+            cadena_lista = ", ".join(str(x) for x in Soluciones)
+            self.labelContadorNewton.config(text=cont)
+            self.labelRaiz.config(text=cadena_lista)
         
         if (self.Secante.get()==1):
             ecu = self.polinomio.get()
@@ -266,6 +272,35 @@ class App():
             self.labelContadorSecante.config(text=cont)
             self.labelRaiz.config(text=cadena_lista)
 
+        if self.steffensen.get() == 1:
+            ecu = self.polinomio.get()
+            ecu = ecu.replace("x", "{}")
+            ecu = lambda x: eval(self.polinomio.get().replace("x", str(x)))
+
+            Soluciones = set()  # conjunto para almacenar los resultados únicos
+
+            for i in range(100):  # ejecutar el código 5 veces
+                a = random.uniform(-20, 20)
+                cont = 0
+                c = a
+                while True:
+                    cont += 1
+                    if cont > 10000: 
+                        break
+                    if abs((ecu(c))) <= 0.0001:
+                        break
+                    else:
+                        c = a - ((ecu(a)**2) / (ecu(a+ecu(a)) - (ecu(a))))
+                        a = c
+                if cont > 1000:  # si se han hecho más de 1000 iteraciones, saltar a la siguiente iteración
+                    continue
+                if all(abs(c - r) > 0.001 for r in Soluciones):  # agregar el resultado solo si es lo suficientemente diferente
+                     Soluciones.add(c)
+            
+            cadena_lista = ", ".join(str(x) for x in Soluciones)
+            self.labelRaiz.config(text=cadena_lista)
+            self.labelContadorSteffensen.config(text=cont)
+
 
     def Graficar(self):
         ecuacion = self.polinomio.get()
@@ -286,11 +321,18 @@ class App():
 
         ax.axhline(y=0, color='k')
         ax.axvline(x=0, color='k')
-        ax.plot(raiz, 0, 'ro')
+        #ax.plot(raiz, 0, 'ro')
+        coeficientes = sympy.parse_expr(ecuacion).as_poly().all_coeffs() # obtener los coeficientes de la ecuación
+# obtener los coeficientes de la ecuación
+        raices = np.roots(coeficientes) # encontrar las raíces
+    
+    # Agregar un punto rojo en cada una de las raíces
+        for raiz in raices:
+            ax.plot(raiz, 0, 'ro')
 
         canvas = FigureCanvasTkAgg(fig, master=self.imagen)
         canvas.draw()
-        canvas.get_tk_widget().pack() 
+        canvas.get_tk_widget().pack()
 
     def limpiar(self):
         canvas = self.imagen.winfo_children()[0]
