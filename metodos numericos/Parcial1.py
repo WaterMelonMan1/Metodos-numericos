@@ -147,24 +147,29 @@ class App():
 
         if (self.Biseccion.get()==1):
             ecu = self.polinomio.get()
-            a = random.randint(-20, 20)
-            b = random.randint(-20, 20)
+            ecu = ecu.replace("x", "{}")
+            Soluciones=[]
+            Max_Seeds=100
+            distancia_minima = 1 
+            i=0
+            
+            
             iterador_max = 1000000
             iterador = 0
-            tolerancia = 0.00001
+            tolerancia = 0.01
             c = 0
 
-            while True:
-                if eval(ecu.format(a)) * eval(ecu.format(b)) < 0:
+            while i <= Max_Seeds:
+                a = random.randint(-20, 20)
+                b = random.randint(-20, 20)
+                if eval(ecu.format(a,a,a)) * eval(ecu.format(b,b,b)) < 0:
                     iterador = 0
                     while True:
                         c = (a + b) / 2
-                        if abs(eval(ecu.format(a)) * eval(ecu.format(c))) <= tolerancia:
-                            iterador = iterador + 1
-                            self.labelContadorBiseccion.config(text=iterador)
-                            self.labelRaiz.config(text=c)
+                        if abs(eval(ecu.format(a,a,a)) * eval(ecu.format(c,c,c))) <= tolerancia:
+                            iterador=iterador+1
                             break
-                        elif eval(ecu.format(a)) * eval(ecu.format(c)) < 0:
+                        elif eval(ecu.format(a,a,a)) * eval(ecu.format(c,c,c)) < 0:
                             b = c
                             iterador = iterador + 1
                         else:
@@ -172,10 +177,17 @@ class App():
                             iterador = iterador + 1
                         if iterador >= iterador_max or abs(b - a) <= tolerancia:
                             break
-                    break
+                    i+=1
+                    c=round(c, 1)
+                    if c not in Soluciones:
+                        if all(abs(c- s) >= distancia_minima for s in Soluciones):
+                            Soluciones.append(c)
                 else:
-                 a = random.randint(-20, 20)
-                 b = random.randint(-20, 20)
+                    a = random.randint(-20, 20)
+                    b = random.randint(-20, 20)
+            cadena_lista = ", ".join(str(x) for x in Soluciones)
+            self.labelRaiz.config(text=cadena_lista)
+            self.labelContadorBiseccion.config(text=iterador)
 
         if (self.Regla.get()==1):
             ecu = self.polinomio.get()
@@ -296,8 +308,9 @@ class App():
 
 
     def Graficar(self):
+        import sympy
         ecuacion = self.polinomio.get()
-        raiz = float(self.labelRaiz.cget("text"))
+        raiz = float(self.labelRaiz.cget("text").split(',')[0])
         if (self.Regla.get()==1 or self.Biseccion.get()==1):
             ecuacion = ecuacion.replace("{}", "x")
         
@@ -316,7 +329,7 @@ class App():
         ax.axvline(x=0, color='k')
         #ax.plot(raiz, 0, 'ro')
         coeficientes = sympy.parse_expr(ecuacion).as_poly().all_coeffs() # obtener los coeficientes de la ecuación
-# obtener los coeficientes de la ecuación
+
         raices = np.roots(coeficientes) # encontrar las raíces
     
     # Agregar un punto rojo en cada una de las raíces
